@@ -10,11 +10,11 @@ const encoder = new TextEncoder()
 const file = await Deno.readFile(args.f);
 const lines = decoder
     .decode(file)
-    .split("\n")
+    .split("\r\n")
 
 const result = [];
 
-for (let i = 0; i < lines.length;) {
+for (let i = 2; i < lines.length;) {
     // ================================================================
     i++; // 消息分组:0xFFFF
     const group = lines[i].replace(/^消息分组:(.*)/, "$1")
