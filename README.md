@@ -1,10 +1,16 @@
+## Export
+
+主菜单(主面板左下角) -> 消息管理 -> 工具(🔽) -> 导出全部消息记录 -> `保存类型(T):` 选择 `文本文件(*.txt,不支持导入)`
+
+Running Version：QQ9.4.9 (27849)
+
 ## Usage
 
 ```bash
 deno run -A index.js -f history.txt
 ```
 
-The output file will be named as `history.txt.json`, located at the same directory of input file.
+Here the output file will be named as `history.txt.json`, located at the same directory of the input file.
 
 ## Example
 
