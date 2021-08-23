@@ -2,7 +2,10 @@ import { parse } from "https://deno.land/std@0.104.0/flags/mod.ts";
 
 const args = parse(Deno.args)
 
-if (!args.f) Deno.exit()
+if (!args.f) {
+    console.log('Invalid argument value: -f\nYou need to specify the input file by "-f" argument.')
+    Deno.exit()
+}
 
 const decoder = new TextDecoder()
 const encoder = new TextEncoder()
@@ -67,3 +70,4 @@ for (let i = 2; i < lines.length;) {
 }
 
 Deno.writeFile(`${args.f}.json`, encoder.encode(JSON.stringify(result, null, 4)))
+console.log(`Output file: ${args.f}.json`)
