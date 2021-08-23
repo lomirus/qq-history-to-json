@@ -1,47 +1,52 @@
+import { parse } from "https://deno.land/std@0.104.0/flags/mod.ts";
+
+const args = parse(Deno.args)
+
+if (!args.f) Deno.exit()
+
 const decoder = new TextDecoder()
 const encoder = new TextEncoder()
 
-const data = await Deno.readFile("history.txt");
-const text = decoder.decode(data);
+const file = await Deno.readFile(args.f);
+const lines = decoder
+    .decode(file)
+    .split("\n")
 
-
-const arr = text.split("\n")
 const result = [];
-let i = 0;
 
-while (i < arr.length) {
+for (let i = 0; i < lines.length;) {
     // ================================================================
     i++; // 消息分组:0xFFFF
-    const group = arr[i].replace(/^消息分组:(.*)/, "$1")
+    const group = lines[i].replace(/^消息分组:(.*)/, "$1")
     i++; // ================================================================
     i++; // 消息对象:Lomirus
-    const username = arr[i].replace(/^消息对象:(.*)/, "$1")
+    const username = lines[i].replace(/^消息对象:(.*)/, "$1")
     i++ // ================================================================
     i++ //
     i++ // 2020-02-02 11:45:15 USERNAME
     const chatHistory = [];
-    while (i < arr.length) {
+    while (i < lines.length) {
         let username1 = "";
         let time = "";
         const message = []
         // 2020-02-02 11:45:15 USERNAME
-        if (/^20\d\d-\d\d-\d\d \d{1,2}:\d\d:\d\d .*/.test(arr[i])) {
-            time = arr[i].replace(/^(20\d\d-\d\d-\d\d \d{1,2}:\d\d:\d\d) .*/, "$1")
-            username1 = arr[i].replace(/^20\d\d-\d\d-\d\d \d{1,2}:\d\d:\d\d (.*)/, "$1")
+        if (/^20\d\d-\d\d-\d\d \d{1,2}:\d\d:\d\d .*/.test(lines[i])) {
+            time = lines[i].replace(/^(20\d\d-\d\d-\d\d \d{1,2}:\d\d:\d\d) .*/, "$1")
+            username1 = lines[i].replace(/^20\d\d-\d\d-\d\d \d{1,2}:\d\d:\d\d (.*)/, "$1")
         }
         i++; // MESSAGE
         // 考虑到消息可能存在多行，这里需要进行遍历
-        while (i < arr.length) {
+        while (i < lines.length) {
             if (
-                arr[i] === "" && (
-                    /^20\d\d-\d\d-\d\d \d{1,2}:\d\d:\d\d /.test(arr[i + 1]) ||
-                    arr[i + 1] === "================================================================"
+                lines[i] === "" && (
+                    /^20\d\d-\d\d-\d\d \d{1,2}:\d\d:\d\d /.test(lines[i + 1]) ||
+                    lines[i + 1] === "================================================================"
                 )
             ) {
                 i++;
                 break;
             } else {
-                message.push(arr[i]);
+                message.push(lines[i]);
                 i++;
             }
         }
@@ -50,7 +55,7 @@ while (i < arr.length) {
             time: time,
             message: message.join("\n")
         })
-        if (arr[i] === "================================================================") {
+        if (lines[i] === "================================================================") {
             break;
         }
     }
@@ -61,4 +66,4 @@ while (i < arr.length) {
     })
 }
 
-Deno.writeFile("history.json", encoder.encode(JSON.stringify(result, null, 4)))
+Deno.writeFile(`${args.f}.json`, encoder.encode(JSON.stringify(result, null, 4)))
